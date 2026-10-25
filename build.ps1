@@ -61,19 +61,21 @@ if ($BuildInstaller) {
             $downloaded = $false
             for ($attempt = 1; $attempt -le 3 -and -not $downloaded; $attempt++) {
                 try {
-                    Invoke-WebRequest -Uri $nsisUrl -OutFile $archive -MaximumRedirection 5
-                    $actualSha256 = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
-                    if ($actualSha256 -ne $expectedSha256) { throw "NSIS 3.13 SHA256 mismatch: $actualSha256" }
-                    if ((Get-Item -LiteralPath $archive).Length -ne 2363925) { throw 'NSIS 3.13 archive has an unexpected length.' }
+                    Invoke-WebRequest -Uri $nsisUrl -OutFile $archive -UserAgent 'node' -MaximumRedirection 5
+                    $archiveLength = (Get-Item -LiteralPath $archive).Length
                     $archiveStream = [System.IO.File]::OpenRead($archive)
                     try {
                         $zipMagic = [byte[]]::new(4)
-                        if ($archiveStream.Read($zipMagic, 0, $zipMagic.Length) -ne $zipMagic.Length -or $zipMagic[0] -ne 0x50 -or $zipMagic[1] -ne 0x4B) {
-                            throw 'NSIS 3.13 response is not a ZIP archive.'
-                        }
+                        $bytesRead = $archiveStream.Read($zipMagic, 0, $zipMagic.Length)
                     } finally {
                         $archiveStream.Dispose()
                     }
+                    if ($bytesRead -ne $zipMagic.Length -or $zipMagic[0] -ne 0x50 -or $zipMagic[1] -ne 0x4B) {
+                        throw "NSIS 3.13 response is not a ZIP archive (length: $archiveLength; signature: $([BitConverter]::ToString($zipMagic)))."
+                    }
+                    if ($archiveLength -ne 2363925) { throw "NSIS 3.13 archive has an unexpected length: $archiveLength" }
+                    $actualSha256 = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
+                    if ($actualSha256 -ne $expectedSha256) { throw "NSIS 3.13 SHA256 mismatch: $actualSha256" }
                     $downloaded = $true
                 } catch {
                     Remove-Item -LiteralPath $archive -Force -ErrorAction SilentlyContinue
