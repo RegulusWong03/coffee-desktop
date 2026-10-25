@@ -57,13 +57,23 @@ if ($BuildInstaller) {
         New-Item -ItemType Directory -Force -Path $nsisRoot | Out-Null
         if (-not (Test-Path -LiteralPath $archive) -or (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash -ne $expectedSha256) {
             Remove-Item -LiteralPath $archive -Force -ErrorAction SilentlyContinue
-            $nsisUrl = 'https://downloads.sourceforge.net/project/nsis/NSIS%203/3.13/nsis-3.13.zip'
+            $nsisUrl = 'https://sf-eu-introserv-1.dl.sourceforge.net/project/nsis/NSIS%203/3.13/nsis-3.13.zip'
             $downloaded = $false
             for ($attempt = 1; $attempt -le 3 -and -not $downloaded; $attempt++) {
                 try {
                     Invoke-WebRequest -Uri $nsisUrl -OutFile $archive -MaximumRedirection 5
                     $actualSha256 = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
                     if ($actualSha256 -ne $expectedSha256) { throw "NSIS 3.13 SHA256 mismatch: $actualSha256" }
+                    if ((Get-Item -LiteralPath $archive).Length -ne 2363925) { throw 'NSIS 3.13 archive has an unexpected length.' }
+                    $archiveStream = [System.IO.File]::OpenRead($archive)
+                    try {
+                        $zipMagic = [byte[]]::new(4)
+                        if ($archiveStream.Read($zipMagic, 0, $zipMagic.Length) -ne $zipMagic.Length -or $zipMagic[0] -ne 0x50 -or $zipMagic[1] -ne 0x4B) {
+                            throw 'NSIS 3.13 response is not a ZIP archive.'
+                        }
+                    } finally {
+                        $archiveStream.Dispose()
+                    }
                     $downloaded = $true
                 } catch {
                     Remove-Item -LiteralPath $archive -Force -ErrorAction SilentlyContinue
