@@ -14,24 +14,28 @@
 
 ## 构建
 
-需要 Windows x64、PowerShell、网络连接（只用于首次下载 SDK、运行时包或安装器编译器）。.NET 10 是 LTS，官方支持到 2028 年 11 月；本项目固定 SDK 10.0.401，并使用微软官方 SHA512 校验。运行时包从本机缓存还原；缓存不足时，构建脚本使用微软 dotnet-public feed。工具只放在工作区 .tools，不做全局安装。
+需要 Windows x64、PowerShell、网络连接（只用于首次下载 SDK、运行时包或安装器编译器）。.NET 10 是 LTS，官方支持到 2028 年 11 月；本项目固定 SDK 10.0.401，并使用微软官方 SHA512 校验。运行时包从本机缓存还原；缓存不足时，构建脚本使用微软 dotnet-public feed。构建脚本优先使用工作区 .tools 内的工具，再使用 PATH 或系统 NSIS；缺少 NSIS 时会下载并校验官方 3.13 便携版，不做全局安装。
 
 官方来源： [.NET 10 下载页](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)、[微软 .NET 支持政策](https://learn.microsoft.com/en-us/dotnet/core/releases-and-support)、[NSIS 下载页](https://nsis.sourceforge.io/Download)。
 
-~~~powershell
-New-Item -ItemType Directory -Force .tools | Out-Null
-Invoke-WebRequest 'https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.401/dotnet-sdk-10.0.401-win-x64.zip' -OutFile '.tools/dotnet-sdk-10.0.401-win-x64.zip'
-$expected = '24b670ad3d923bfcf47df6c3b034152398b42f6dbc388e10d783aee1cfb5e5817d399fc0ae2a12cfa822a55e61d34830ccb15c50ef6efee437ab874bb7c79430'
-if ((Get-FileHash '.tools/dotnet-sdk-10.0.401-win-x64.zip' -Algorithm SHA512).Hash.ToLowerInvariant() -ne $expected) { throw 'SDK SHA512 mismatch' }
-Expand-Archive '.tools/dotnet-sdk-10.0.401-win-x64.zip' '.tools/dotnet'
-Invoke-WebRequest 'https://downloads.sourceforge.net/project/nsis/NSIS%203/3.13/nsis-3.13.zip' -OutFile '.tools/nsis-3.13.zip'
-Expand-Archive '.tools/nsis-3.13.zip' '.tools/nsis'
-.\build.ps1 -BuildInstaller
-~~~
 
-仅构建应用可运行 `.\build.ps1`；要生成安装器则运行 `.\build.ps1 -BuildInstaller`，并按需准备上文的 NSIS 工具。源程序输出在 `release/CoffeeDesktop-win-x64`，安装包输出在 `release/CoffeeDesktop-Setup-win-x64.exe`。SDK zip 与 NSIS zip 不进入安装包。
+仅构建应用可运行 `.\build.ps1`；要生成安装器则运行 `.\build.ps1 -BuildInstaller`。源程序输出在 `release/CoffeeDesktop-win-x64`，安装包输出在 `release/CoffeeDesktop-Setup-win-x64.exe`。SDK zip 与 NSIS zip 不进入安装包。
 
 assets/spritesheet.png 是从本机咖啡宠物目录只读复制的 v2 资产：1536×2288 透明 PNG，8列×11行，每格192×208。本程序使用 row0 待机6帧、row1/2行走8帧、row3招手4帧、row4跳跃5帧、row5垂耳8帧、row6举爪6帧、row7转头6帧、row8理爪6帧，以及row9/10的16个静态看向方向帧。动画时序使用固定帧间隔；原图不修改、不重画。
+
+## 发布
+
+GitHub Actions 在推送 `vMAJOR.MINOR.PATCH` 语义版本标签时，使用 Windows runner 构建自包含 x64 安装包、生成 SHA-256 文件并发布同名 GitHub Release。应用版本只在 `src/Coffee.Desktop/Coffee.Desktop.csproj` 的 `Version` 属性维护；发布标签去掉 `v` 后必须与该版本完全一致，否则构建会失败。新版本先修改该属性并提交，再创建并推送匹配标签，例如：
+
+~~~powershell
+git add src/Coffee.Desktop/Coffee.Desktop.csproj
+git commit -m "Release Coffee Desktop 1.0.1"
+git push origin main
+git tag v1.0.1
+git push origin v1.0.1
+~~~
+
+Release 附件为 `CoffeeDesktop-Setup-win-x64.exe` 和 `CoffeeDesktop-Setup-win-x64.exe.sha256`。Actions run 可在仓库的 Actions 页面查看。工作流只处理 tag 发布，不包含客户端自动更新。
 
 ## 需求与实现
 
