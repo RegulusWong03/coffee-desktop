@@ -81,6 +81,4 @@ jobs:
             'release-assets/CoffeeDesktop-Setup-win-x64.exe.sha256' `
             --verify-tag `
             --title "咖啡桌宠 $env:RELEASE_TAG" `
-            --notes '咖啡桌宠首版，适用于 Windows x64。安装包可独立运行，无需预装 .NET；默认不会启动外部程序，可选绑定 exe 并启用单击启动。登录自启默认关闭，全屏时默认自动隐藏。
-
-下载 CoffeeDesktop-Setup-win-x64.exe；CoffeeDesktop-Setup-win-x64.exe.sha256 提供安装包的 SHA-256 校验值。安装卸载、真实拖动、混合 DPI 多屏和登录自启尚未完成目标设备验证。'
+            --notes '咖啡桌宠 Windows x64 安装包，可独立运行，无需预装 .NET；默认不启动外部程序，可选绑定 exe 并启用单击启动。登录自启默认关闭，全屏时默认自动隐藏。下载 exe 安装包后，可用同名 .sha256 文件校验。安装卸载、真实拖动、混合 DPI 多屏和登录自启尚未在目标设备验证。'
