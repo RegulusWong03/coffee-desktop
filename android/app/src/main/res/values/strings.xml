@@ -1,0 +1,16 @@
+<resources>
+    <string name="small_widget_label">小号咖啡猫</string>
+    <string name="large_widget_label">大号咖啡猫</string>
+    <string name="small_widget_description">小号咖啡猫，点击播放一次动作，可调整尺寸。</string>
+    <string name="large_widget_description">大号咖啡猫，点击播放一次动作，可调整尺寸。</string>
+    <string name="widget_content_description">咖啡桌宠，点击播放动作</string>
+    <string name="prototype_instructions">咖啡 Android P0 原型诊断\n\n请从桌面添加“小/大号咖啡猫”小部件。动画、busy 忽略、实例隔离与末帧待机必须在桌面小部件上验收；此应用页仅供诊断，不是动画替代。\n\n默认帧间隔 170 ms；P0 候选上限 300 ms。</string>
+    <string name="mode_section_title">P0 真机对照路径</string>
+    <string name="mode_per_frame">短时逐帧 RemoteViews 资源引用（当前候选）</string>
+    <string name="mode_host_advance">AdapterViewFlipper 宿主推进 + goAsync 末尾静态提交</string>
+    <string name="speed_default">默认帧间隔 170 ms</string>
+    <string name="speed_slow">慢速上限候选 300 ms</string>
+    <string name="speed_section_title">P0 速度边界</string>
+    <string name="mode_apply">应用到全部原型小部件</string>
+    <string name="mode_applied">播放候选已应用；请在桌面小部件上比较</string>
+</resources>

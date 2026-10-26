@@ -1,0 +1,5 @@
+# Local template only. Copy to the external signing directory; never put real values here.
+storeFile=REPLACE_WITH_EXTERNAL_KEYSTORE_PATH_OR_RELATIVE_FILENAME
+storePassword=REPLACE_WITH_LOCAL_SECRET
+keyAlias=coffee-release
+keyPassword=REPLACE_WITH_LOCAL_SECRET

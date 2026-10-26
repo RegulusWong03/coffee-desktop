@@ -32,3 +32,24 @@ COFFEE_*_1025.txt
 *.p12
 *.key
 *credentials*
+
+# Android build outputs, local SDK/JDK caches, and signing material
+android/.gradle/
+android/.kotlin/
+android/local.properties
+android/**/build/
+*.jks
+*.keystore
+signing.properties
+.tools/android-sdk/
+.tools/android-jdk/
+.tools/gradle-*/
+.tools/*jdk*.zip
+.tools/commandlinetools-*.zip
+android/**/__pycache__/
+*.pyc
+
+# Private device QA evidence and an accidental hash-path scratch file
+docs/android-p0-evidence/
+docs/android-p1-p2-evidence/
+/*  app-debug.apk

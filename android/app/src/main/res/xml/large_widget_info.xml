@@ -1,0 +1,9 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="160dp" android:minHeight="160dp"
+    android:targetCellWidth="2" android:targetCellHeight="2"
+    android:minResizeWidth="80dp" android:minResizeHeight="80dp"
+    android:initialLayout="@layout/pet_widget"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:updatePeriodMillis="0"
+    android:description="@string/large_widget_description" />
